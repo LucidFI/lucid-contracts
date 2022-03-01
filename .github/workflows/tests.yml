@@ -17,7 +17,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: setup and run hardhat tests
         run: |
-          echo 'DEPLOY_PK=0xc211950B090B5FDE9483048de082B874FB2150C6' > .env
+          echo 'DEPLOY_PK=${{ secrets.DEPLOY_PK }}' > .env
           yarn 
           yarn compile
           yarn test
