@@ -24,6 +24,20 @@ DEPLOY_PK=xxx
 INFURA_API_KEY=xx
 ```
 
+
+## Install packages 
+
+
+```bash
+npm install 
+```
+
 ## Testing the smart contracts
 
 If you have setup everything above you should be able to run the test suite
+
+```bash
+npm run test
+```
+
+
