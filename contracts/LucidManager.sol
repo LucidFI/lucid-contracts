@@ -2,20 +2,23 @@
 pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "./interfaces/ILucidManager.sol";
+import "./libraries/ContextMixin.sol";
+import "./libraries/NativeMetaTransaction.sol";
 
 error NotContractOwner(address _sender);
 error ZeroAddress();
 error ValueMustBeGreaterThanZero();
 
-contract LucidManager is ILucidManager {
+contract LucidManager is ILucidManager, ContextMixin, NativeMetaTransaction  {
     bytes32 public immutable description;
     FeeInfo public feeInfo;
     IERC20 public lucidToken;
     address public owner;
 
     modifier onlyOwner() {
-        if (owner != msg.sender) revert NotContractOwner(msg.sender);
+        if (owner != _msgSender()) revert NotContractOwner(_msgSender());
         _;
     }
 
@@ -24,7 +27,7 @@ contract LucidManager is ILucidManager {
         address payable _collectionAddress,
         uint32 _feeBasisPoints
     ) {
-        owner = msg.sender;
+        owner = _msgSender();
         feeInfo.collectionAddress = _collectionAddress;
         description = _description;
         feeInfo.feeBasisPoints = _feeBasisPoints;
@@ -39,9 +42,17 @@ contract LucidManager is ILucidManager {
         emit OwnerChanged(
             address(this),
             address(0),
-            msg.sender,
+            _msgSender(),
             block.timestamp
         );
+    }
+
+    function _msgSender()
+        internal
+        view
+        returns (address sender)
+    {
+        return ContextMixin.msgSender();
     }
 
     function setOwner(address _newOwner) external override onlyOwner {

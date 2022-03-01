@@ -9,6 +9,7 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -20,10 +21,15 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface LucidManagerInterface extends utils.Interface {
   contractName: "LucidManager";
   functions: {
+    "ERC712_VERSION()": FunctionFragment;
     "description()": FunctionFragment;
+    "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "feeInfo()": FunctionFragment;
+    "getChainId()": FunctionFragment;
+    "getDomainSeperator()": FunctionFragment;
     "getFeeInfo(address)": FunctionFragment;
     "getLucidBalance(address)": FunctionFragment;
+    "getNonce(address)": FunctionFragment;
     "getTransactionFee(address,uint256)": FunctionFragment;
     "lucidToken()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -36,15 +42,32 @@ export interface LucidManagerInterface extends utils.Interface {
   };
 
   encodeFunctionData(
+    functionFragment: "ERC712_VERSION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "description",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "executeMetaTransaction",
+    values: [string, BytesLike, BytesLike, BytesLike, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "feeInfo", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getChainId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getDomainSeperator",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "getFeeInfo", values: [string]): string;
   encodeFunctionData(
     functionFragment: "getLucidBalance",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "getNonce", values: [string]): string;
   encodeFunctionData(
     functionFragment: "getTransactionFee",
     values: [string, BigNumberish]
@@ -77,15 +100,29 @@ export interface LucidManagerInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "ERC712_VERSION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "description",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeMetaTransaction",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "feeInfo", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getDomainSeperator",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getFeeInfo", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getLucidBalance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getTransactionFee",
     data: BytesLike
@@ -116,6 +153,7 @@ export interface LucidManagerInterface extends utils.Interface {
     "FeeChanged(address,uint256,uint256,uint256)": EventFragment;
     "FeeThresholdChanged(address,uint256,uint256,uint256)": EventFragment;
     "LucidTokenChanged(address,address,address,uint256)": EventFragment;
+    "MetaTransactionExecuted(address,address,bytes)": EventFragment;
     "OwnerChanged(address,address,address,uint256)": EventFragment;
     "ReducedFeeChanged(address,uint256,uint256,uint256)": EventFragment;
   };
@@ -124,6 +162,7 @@ export interface LucidManagerInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "FeeChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeeThresholdChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LucidTokenChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MetaTransactionExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnerChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReducedFeeChanged"): EventFragment;
 }
@@ -179,6 +218,14 @@ export type LucidTokenChangedEvent = TypedEvent<
 export type LucidTokenChangedEventFilter =
   TypedEventFilter<LucidTokenChangedEvent>;
 
+export type MetaTransactionExecutedEvent = TypedEvent<
+  [string, string, string],
+  { userAddress: string; relayerAddress: string; functionSignature: string }
+>;
+
+export type MetaTransactionExecutedEventFilter =
+  TypedEventFilter<MetaTransactionExecutedEvent>;
+
 export type OwnerChangedEvent = TypedEvent<
   [string, string, string, BigNumber],
   {
@@ -232,7 +279,18 @@ export interface LucidManager extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<[string]>;
+
     description(overrides?: CallOverrides): Promise<[string]>;
+
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     feeInfo(
       overrides?: CallOverrides
@@ -245,6 +303,10 @@ export interface LucidManager extends BaseContract {
       }
     >;
 
+    getChainId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<[string]>;
+
     getFeeInfo(
       _holder: string,
       overrides?: CallOverrides
@@ -254,6 +316,11 @@ export interface LucidManager extends BaseContract {
       _holder: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    getNonce(
+      user: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { nonce: BigNumber }>;
 
     getTransactionFee(
       _holder: string,
@@ -298,7 +365,18 @@ export interface LucidManager extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
   description(overrides?: CallOverrides): Promise<string>;
+
+  executeMetaTransaction(
+    userAddress: string,
+    functionSignature: BytesLike,
+    sigR: BytesLike,
+    sigS: BytesLike,
+    sigV: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   feeInfo(
     overrides?: CallOverrides
@@ -311,6 +389,10 @@ export interface LucidManager extends BaseContract {
     }
   >;
 
+  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
   getFeeInfo(
     _holder: string,
     overrides?: CallOverrides
@@ -320,6 +402,8 @@ export interface LucidManager extends BaseContract {
     _holder: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   getTransactionFee(
     _holder: string,
@@ -364,7 +448,18 @@ export interface LucidManager extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
     description(overrides?: CallOverrides): Promise<string>;
+
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     feeInfo(
       overrides?: CallOverrides
@@ -377,6 +472,10 @@ export interface LucidManager extends BaseContract {
       }
     >;
 
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
     getFeeInfo(
       _holder: string,
       overrides?: CallOverrides
@@ -386,6 +485,8 @@ export interface LucidManager extends BaseContract {
       _holder: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     getTransactionFee(
       _holder: string,
@@ -480,6 +581,17 @@ export interface LucidManager extends BaseContract {
       blocktime?: null
     ): LucidTokenChangedEventFilter;
 
+    "MetaTransactionExecuted(address,address,bytes)"(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+    MetaTransactionExecuted(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+
     "OwnerChanged(address,address,address,uint256)"(
       lucidManager?: string | null,
       prevOwner?: null,
@@ -508,9 +620,24 @@ export interface LucidManager extends BaseContract {
   };
 
   estimateGas: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
     description(overrides?: CallOverrides): Promise<BigNumber>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     feeInfo(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<BigNumber>;
 
     getFeeInfo(_holder: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -518,6 +645,8 @@ export interface LucidManager extends BaseContract {
       _holder: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     getTransactionFee(
       _holder: string,
@@ -561,9 +690,26 @@ export interface LucidManager extends BaseContract {
   };
 
   populateTransaction: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     description(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     feeInfo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getDomainSeperator(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getFeeInfo(
       _holder: string,
@@ -572,6 +718,11 @@ export interface LucidManager extends BaseContract {
 
     getLucidBalance(
       _holder: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNonce(
+      user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -5,13 +5,15 @@ import "@gnosis.pm/safe-contracts/contracts/base/OwnerManager.sol";
 import "./LucidBudgeteer.sol";
 import "./BatchCreate.sol";
 import "./interfaces/ILucidTx.sol";
+import "./libraries/ContextMixin.sol";
+import "./libraries/NativeMetaTransaction.sol";
 
 /// @title LucidBudgeteerModule
 /// @author @sherodtaylor
 /// @notice A gnosis module for LucidBudgeteer allowing permissionless use of basic LucidTx and LucidBudgeteer
 ///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe.
 
-contract LucidBudgeteerModule is Module {
+contract LucidBudgeteerModule is Module, ContextMixin, NativeMetaTransaction {
     string public constant VERSION = "0.0.9";
     address public lucidBudgeteerAddress;
     address public lucidTxAddress;
@@ -27,7 +29,7 @@ contract LucidBudgeteerModule is Module {
     /// checks the avatar of the module (will be the gnosis safe) and ensures the EOA is a signer on the safe.
     modifier onlySafeOwner() {
         require(
-            OwnerManager(avatar).isOwner(msg.sender),
+            OwnerManager(avatar).isOwner(_msgSender()),
             "LUCIDMODULE: Not safe owner"
         );
         _;
@@ -53,6 +55,16 @@ contract LucidBudgeteerModule is Module {
         setUp(initParams);
     }
 
+    function _msgSender()
+        internal
+        view
+        override
+        returns (address sender)
+    {
+        return ContextMixin.msgSender();
+    }
+
+
     function setUp(bytes memory initParams) public override initializer {
         (
             address _safe,
@@ -69,7 +81,7 @@ contract LucidBudgeteerModule is Module {
         lucidTxAddress = _lucidTx;
         batchCreateAddress = _batchCreate;
 
-        emit LucidBudgeteerModuleDeploy(VERSION, _safe, address(this), msg.sender);
+        emit LucidBudgeteerModuleDeploy(VERSION, _safe, address(this), _msgSender());
     }
 
     function createLucidTx(

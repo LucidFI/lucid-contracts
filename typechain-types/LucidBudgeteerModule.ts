@@ -9,6 +9,7 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -98,12 +99,17 @@ export declare namespace LucidBudgeteer {
 export interface LucidBudgeteerModuleInterface extends utils.Interface {
   contractName: "LucidBudgeteerModule";
   functions: {
+    "ERC712_VERSION()": FunctionFragment;
     "VERSION()": FunctionFragment;
     "avatar()": FunctionFragment;
     "batchCreate((string,string,address,address,uint256,uint256,address,bytes32,(bytes32,uint8,uint8))[])": FunctionFragment;
     "batchCreateAddress()": FunctionFragment;
     "createLucidTx((uint256,address,address,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)": FunctionFragment;
+    "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
+    "getChainId()": FunctionFragment;
+    "getDomainSeperator()": FunctionFragment;
     "getGuard()": FunctionFragment;
+    "getNonce(address)": FunctionFragment;
     "guard()": FunctionFragment;
     "lucidBudgeteerAddress()": FunctionFragment;
     "lucidTxAddress()": FunctionFragment;
@@ -120,6 +126,10 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
     "updateLucidTag(uint256,bytes32)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "ERC712_VERSION",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
   encodeFunctionData(functionFragment: "avatar", values?: undefined): string;
   encodeFunctionData(
@@ -134,7 +144,20 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
     functionFragment: "createLucidTx",
     values: [LucidBudgeteer.ClaimParamsStruct, BytesLike, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "executeMetaTransaction",
+    values: [string, BytesLike, BytesLike, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getDomainSeperator",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "getGuard", values?: undefined): string;
+  encodeFunctionData(functionFragment: "getNonce", values: [string]): string;
   encodeFunctionData(functionFragment: "guard", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lucidBudgeteerAddress",
@@ -171,6 +194,10 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
     values: [BigNumberish, BytesLike]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "ERC712_VERSION",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "avatar", data: BytesLike): Result;
   decodeFunctionResult(
@@ -185,7 +212,17 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
     functionFragment: "createLucidTx",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeMetaTransaction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getDomainSeperator",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getGuard", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "guard", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lucidBudgeteerAddress",
@@ -226,6 +263,7 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
     "AvatarSet(address,address)": EventFragment;
     "ChangedGuard(address)": EventFragment;
     "LucidBudgeteerModuleDeploy(string,address,address,address)": EventFragment;
+    "MetaTransactionExecuted(address,address,bytes)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "TargetSet(address,address)": EventFragment;
   };
@@ -233,6 +271,7 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "AvatarSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ChangedGuard"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LucidBudgeteerModuleDeploy"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MetaTransactionExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TargetSet"): EventFragment;
 }
@@ -255,6 +294,14 @@ export type LucidBudgeteerModuleDeployEvent = TypedEvent<
 
 export type LucidBudgeteerModuleDeployEventFilter =
   TypedEventFilter<LucidBudgeteerModuleDeployEvent>;
+
+export type MetaTransactionExecutedEvent = TypedEvent<
+  [string, string, string],
+  { userAddress: string; relayerAddress: string; functionSignature: string }
+>;
+
+export type MetaTransactionExecutedEventFilter =
+  TypedEventFilter<MetaTransactionExecutedEvent>;
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string],
@@ -299,6 +346,8 @@ export interface LucidBudgeteerModule extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<[string]>;
+
     VERSION(overrides?: CallOverrides): Promise<[string]>;
 
     avatar(overrides?: CallOverrides): Promise<[string]>;
@@ -317,7 +366,25 @@ export interface LucidBudgeteerModule extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<[string]>;
+
     getGuard(overrides?: CallOverrides): Promise<[string] & { _guard: string }>;
+
+    getNonce(
+      user: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { nonce: BigNumber }>;
 
     guard(overrides?: CallOverrides): Promise<[string]>;
 
@@ -375,6 +442,8 @@ export interface LucidBudgeteerModule extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
   VERSION(overrides?: CallOverrides): Promise<string>;
 
   avatar(overrides?: CallOverrides): Promise<string>;
@@ -393,7 +462,22 @@ export interface LucidBudgeteerModule extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  executeMetaTransaction(
+    userAddress: string,
+    functionSignature: BytesLike,
+    sigR: BytesLike,
+    sigS: BytesLike,
+    sigV: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
   getGuard(overrides?: CallOverrides): Promise<string>;
+
+  getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   guard(overrides?: CallOverrides): Promise<string>;
 
@@ -451,6 +535,8 @@ export interface LucidBudgeteerModule extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
     VERSION(overrides?: CallOverrides): Promise<string>;
 
     avatar(overrides?: CallOverrides): Promise<string>;
@@ -469,7 +555,22 @@ export interface LucidBudgeteerModule extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
     getGuard(overrides?: CallOverrides): Promise<string>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     guard(overrides?: CallOverrides): Promise<string>;
 
@@ -539,6 +640,17 @@ export interface LucidBudgeteerModule extends BaseContract {
       initiator?: string | null
     ): LucidBudgeteerModuleDeployEventFilter;
 
+    "MetaTransactionExecuted(address,address,bytes)"(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+    MetaTransactionExecuted(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -559,6 +671,8 @@ export interface LucidBudgeteerModule extends BaseContract {
   };
 
   estimateGas: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
     VERSION(overrides?: CallOverrides): Promise<BigNumber>;
 
     avatar(overrides?: CallOverrides): Promise<BigNumber>;
@@ -577,7 +691,22 @@ export interface LucidBudgeteerModule extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<BigNumber>;
+
     getGuard(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     guard(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -636,6 +765,8 @@ export interface LucidBudgeteerModule extends BaseContract {
   };
 
   populateTransaction: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     avatar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -656,7 +787,27 @@ export interface LucidBudgeteerModule extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getDomainSeperator(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getGuard(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getNonce(
+      user: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     guard(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

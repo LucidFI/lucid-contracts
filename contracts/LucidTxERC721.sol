@@ -5,10 +5,13 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interfaces/ILucidManager.sol";
-import "./interfaces/ILucidTx.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+
+import "./interfaces/ILucidManager.sol";
+import "./interfaces/ILucidTx.sol";
+import "./libraries/ContextMixin.sol";
+import "./libraries/NativeMetaTransaction.sol";
 
 error ZeroAddress();
 error PastDueDate();
@@ -39,7 +42,7 @@ abstract contract LucidTxERC721URI is Ownable, ERC721URIStorage {
     }
 }
 
-contract LucidTxERC721 is ILucidTx, LucidTxERC721URI {
+contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTransaction {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
     using Address for address;
@@ -50,13 +53,13 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI {
     mapping(uint256 => Claim) private claimTokens;
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
+        if (ownerOf(tokenId) != _msgSender()) revert NotCreditor(_msgSender());
         _;
     }
     
     modifier onlyDebtor(uint256 tokenId) {
-        if (claimTokens[tokenId].debtor != msg.sender)
-            revert NotDebtor(msg.sender);
+        if (claimTokens[tokenId].debtor != _msgSender())
+            revert NotDebtor(_msgSender());
         _;
     }
 
@@ -80,6 +83,16 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI {
         setLucidManager(lucidManager_);
         setBaseURI(baseURI_);
     }
+
+    function _msgSender()
+        internal
+        view
+        override
+        returns (address sender)
+    {
+        return ContextMixin.msgSender();
+    }
+
 
     function setLucidManager(address _lucidManager) public onlyOwner {
         address prevLucidManager = lucidManager;
@@ -125,7 +138,7 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI {
         emit ClaimCreated(
             lucidManager,
             newTokenId,
-            msg.sender,
+            _msgSender(),
             creditor,
             debtor,
             tx.origin,
@@ -203,17 +216,17 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI {
 
         (address collectionAddress, uint256 transactionFee) = ILucidManager(
             lucidManager
-        ).getTransactionFee(msg.sender, totalPayment);
+        ).getTransactionFee(_msgSender(), totalPayment);
 
         IERC20(claim.claimToken).safeTransferFrom(
-            msg.sender,
+            _msgSender(),
             creditor,
             totalPayment - transactionFee
         );
 
         if (transactionFee > 0) {
             IERC20(claim.claimToken).safeTransferFrom(
-                msg.sender,
+                _msgSender(),
                 collectionAddress,
                 transactionFee
             );
@@ -223,7 +236,7 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI {
             lucidManager,
             tokenId,
             claim.debtor,
-            msg.sender,
+            _msgSender(),
             tx.origin,
             paymentAmount,
             block.timestamp

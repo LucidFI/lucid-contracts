@@ -4,8 +4,10 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "./interfaces/ILucidTx.sol";
 import "./LucidTxERC721.sol";
+import "./libraries/ContextMixin.sol";
+import "./libraries/NativeMetaTransaction.sol";
 
-contract LucidBudgeteer {
+contract LucidBudgeteer is ContextMixin, NativeMetaTransaction {
     address public lucidTxERC721;
 
     event LucidTagUpdated(
@@ -43,13 +45,21 @@ contract LucidBudgeteer {
         );
     }
 
+    function _msgSender()
+        internal
+        view
+        returns (address sender)
+    {
+        return ContextMixin.msgSender();
+    }
+
     function createLucidTx(
         ClaimParams calldata claim,
         bytes32 lucidTag,
         string calldata _tokenUri
     ) public returns (uint256) {
-        if (msg.sender != claim.creditor && msg.sender != claim.debtor)
-            revert NotCreditorOrDebtor(msg.sender);
+        if (_msgSender() != claim.creditor && _msgSender() != claim.debtor)
+            revert NotCreditorOrDebtor(_msgSender());
 
         address _lucidTxERC721Address = lucidTxERC721;
         uint256 newTokenId = LucidTxERC721(_lucidTxERC721Address)
@@ -67,7 +77,7 @@ contract LucidBudgeteer {
         emit LucidTagUpdated(
             ILucidTx(_lucidTxERC721Address).lucidManager(),
             newTokenId,
-            msg.sender,
+            _msgSender(),
             lucidTag,
             block.timestamp
         );
@@ -82,13 +92,13 @@ contract LucidBudgeteer {
 
         address claimOwner = _lucidTxERC721.ownerOf(tokenId);
         Claim memory lucidTx = _lucidTxERC721.getClaim(tokenId);
-        if (msg.sender != claimOwner && msg.sender != lucidTx.debtor)
-            revert NotCreditorOrDebtor(msg.sender);
+        if (_msgSender() != claimOwner && _msgSender() != lucidTx.debtor)
+            revert NotCreditorOrDebtor(_msgSender());
 
         emit LucidTagUpdated(
             ILucidTx(_lucidTxERC721Address).lucidManager(),
             tokenId,
-            msg.sender,
+            _msgSender(),
             newTag,
             block.timestamp
         );
