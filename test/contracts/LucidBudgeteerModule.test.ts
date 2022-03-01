@@ -117,7 +117,7 @@ describe("test module", async () => {
       "notARealURI"
     );
 
-  describe("Lucid Banker - Gnosis Safe Module", async () => {
+  describe("Lucid Budgeteer - Gnosis Safe Module", async () => {
     describe("createClaim", async () => {
       it("should create a claim via module", async () => {
         const { lucidBudgeteerModule, lucidToken, lucidTx, safe } =

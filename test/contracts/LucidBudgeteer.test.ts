@@ -14,7 +14,7 @@ import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
-describe("Lucid Banker", function () {
+describe("Lucid Budgeteer", function () {
     let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let lucidManager: LucidManager;
     let lucidBudgeteer: LucidBudgeteer;
