@@ -32,12 +32,17 @@ INFURA_API_KEY=xx
 npm install 
 ```
 
-## Testing the smart contracts
-
+## Testing contracts
 If you have setup everything above you should be able to run the test suite
 
 ```bash
 npm run test
 ```
 
+## Deploying contracts
 
+If tests pass all you need to do is run. You can specify the network just look at package.json for the command.
+
+```bash
+npm run deploy:mumbai
+```
