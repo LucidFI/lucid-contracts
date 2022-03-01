@@ -3,6 +3,10 @@ pragma solidity ^0.8.7;
 
 import "./interfaces/ILucidTx.sol";
 import "./LucidBudgeteer.sol";
+import "./libraries/ContextMixin.sol";
+import "./libraries/NativeMetaTransaction.sol";
+import "./libraries/ContextMixin.sol";
+import "./libraries/NativeMetaTransaction.sol";
 
 error NotOwner();
 error BatchTooLarge();
@@ -14,7 +18,7 @@ error BatchFailed();
 /// @notice A contract to allow for the creation of multiple claims in a single transaction.
 /// @dev Uses delegatecall to forward the value of msg.sender to LucidBudgeteer.
 /// @dev Max operations should be wary of the block gas limit on a certain network
-contract BatchCreate {
+contract BatchCreate is ContextMixin, NativeMetaTransaction {
     address public lucidTxERC721;
     address public lucidBudgeteer;
     uint8 public maxOperations;
@@ -52,6 +56,14 @@ contract BatchCreate {
         lucidBudgeteer = _lucidBudgeteer;
         maxOperations = _maxOperations;
         owner = msg.sender;
+    }
+
+    function _msgSender()
+        internal
+        view
+        returns (address sender)
+    {
+        return ContextMixin.msgSender();
     }
 
     function transferOwnership(address newOwner) public onlyOwner {

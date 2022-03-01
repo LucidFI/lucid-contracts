@@ -9,6 +9,7 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -60,14 +61,19 @@ export type ClaimStructOutput = [
 export interface LucidTxERC721Interface extends utils.Interface {
   contractName: "LucidTxERC721";
   functions: {
+    "ERC712_VERSION()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "createClaim(address,address,string,uint256,uint256,address,(bytes32,uint8,uint8))": FunctionFragment;
     "createClaimWithURI(address,address,string,uint256,uint256,address,(bytes32,uint8,uint8),string)": FunctionFragment;
+    "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getChainId()": FunctionFragment;
     "getClaim(uint256)": FunctionFragment;
+    "getDomainSeperator()": FunctionFragment;
+    "getNonce(address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lucidManager()": FunctionFragment;
     "name()": FunctionFragment;
@@ -89,6 +95,10 @@ export interface LucidTxERC721Interface extends utils.Interface {
     "transferOwnership(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "ERC712_VERSION",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
@@ -122,13 +132,26 @@ export interface LucidTxERC721Interface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "executeMetaTransaction",
+    values: [string, BytesLike, BytesLike, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getClaim",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getDomainSeperator",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "getNonce", values: [string]): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [string, string]
@@ -194,6 +217,10 @@ export interface LucidTxERC721Interface extends utils.Interface {
     values: [string]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "ERC712_VERSION",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
@@ -207,10 +234,20 @@ export interface LucidTxERC721Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "executeMetaTransaction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getClaim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getDomainSeperator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -276,6 +313,7 @@ export interface LucidTxERC721Interface extends utils.Interface {
     "ClaimRescinded(address,uint256,uint256)": EventFragment;
     "FeePaid(address,uint256,address,uint256,uint256,uint256)": EventFragment;
     "LucidManagerSet(address,address,uint256)": EventFragment;
+    "MetaTransactionExecuted(address,address,bytes)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
@@ -288,6 +326,7 @@ export interface LucidTxERC721Interface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ClaimRescinded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeePaid"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LucidManagerSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MetaTransactionExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -383,6 +422,14 @@ export type LucidManagerSetEvent = TypedEvent<
 
 export type LucidManagerSetEventFilter = TypedEventFilter<LucidManagerSetEvent>;
 
+export type MetaTransactionExecutedEvent = TypedEvent<
+  [string, string, string],
+  { userAddress: string; relayerAddress: string; functionSignature: string }
+>;
+
+export type MetaTransactionExecutedEventFilter =
+  TypedEventFilter<MetaTransactionExecutedEvent>;
+
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string],
   { previousOwner: string; newOwner: string }
@@ -426,6 +473,8 @@ export interface LucidTxERC721 extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<[string]>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -464,15 +513,33 @@ export interface LucidTxERC721 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getChainId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getClaim(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[ClaimStructOutput]>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<[string]>;
+
+    getNonce(
+      user: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { nonce: BigNumber }>;
 
     isApprovedForAll(
       owner: string,
@@ -569,6 +636,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
   approve(
     to: string,
     tokenId: BigNumberish,
@@ -607,15 +676,30 @@ export interface LucidTxERC721 extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  executeMetaTransaction(
+    userAddress: string,
+    functionSignature: BytesLike,
+    sigR: BytesLike,
+    sigS: BytesLike,
+    sigV: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   getApproved(
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
   getClaim(
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<ClaimStructOutput>;
+
+  getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
+  getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   isApprovedForAll(
     owner: string,
@@ -706,6 +790,8 @@ export interface LucidTxERC721 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -741,15 +827,30 @@ export interface LucidTxERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getClaim(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<ClaimStructOutput>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     isApprovedForAll(
       owner: string,
@@ -950,6 +1051,17 @@ export interface LucidTxERC721 extends BaseContract {
       blocktime?: null
     ): LucidManagerSetEventFilter;
 
+    "MetaTransactionExecuted(address,address,bytes)"(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+    MetaTransactionExecuted(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -972,6 +1084,8 @@ export interface LucidTxERC721 extends BaseContract {
   };
 
   estimateGas: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -1010,15 +1124,30 @@ export interface LucidTxERC721 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getClaim(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     isApprovedForAll(
       owner: string,
@@ -1116,6 +1245,8 @@ export interface LucidTxERC721 extends BaseContract {
   };
 
   populateTransaction: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -1157,13 +1288,33 @@ export interface LucidTxERC721 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getClaim(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getDomainSeperator(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNonce(
+      user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

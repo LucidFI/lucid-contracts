@@ -101,6 +101,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILucidTx__factory>;
     getContractFactory(
+      name: "EIP712Base",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EIP712Base__factory>;
+    getContractFactory(
+      name: "NativeMetaTransaction",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.NativeMetaTransaction__factory>;
+    getContractFactory(
       name: "LucidBudgeteer",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.LucidBudgeteer__factory>;
@@ -247,6 +255,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ILucidTx>;
+    getContractAt(
+      name: "EIP712Base",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EIP712Base>;
+    getContractAt(
+      name: "NativeMetaTransaction",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.NativeMetaTransaction>;
     getContractAt(
       name: "LucidBudgeteer",
       address: string,

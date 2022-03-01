@@ -9,11 +9,12 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
 } from "ethers";
-import { FunctionFragment, Result } from "@ethersproject/abi";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
@@ -68,7 +69,12 @@ export declare namespace BatchCreate {
 export interface BatchCreateInterface extends utils.Interface {
   contractName: "BatchCreate";
   functions: {
+    "ERC712_VERSION()": FunctionFragment;
     "batchCreate((string,string,address,address,uint256,uint256,address,bytes32,(bytes32,uint8,uint8))[])": FunctionFragment;
+    "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
+    "getChainId()": FunctionFragment;
+    "getDomainSeperator()": FunctionFragment;
+    "getNonce(address)": FunctionFragment;
     "lucidBudgeteer()": FunctionFragment;
     "lucidTxERC721()": FunctionFragment;
     "maxOperations()": FunctionFragment;
@@ -78,9 +84,26 @@ export interface BatchCreateInterface extends utils.Interface {
   };
 
   encodeFunctionData(
+    functionFragment: "ERC712_VERSION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "batchCreate",
     values: [BatchCreate.CreateClaimParamsStruct[]]
   ): string;
+  encodeFunctionData(
+    functionFragment: "executeMetaTransaction",
+    values: [string, BytesLike, BytesLike, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getDomainSeperator",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "getNonce", values: [string]): string;
   encodeFunctionData(
     functionFragment: "lucidBudgeteer",
     values?: undefined
@@ -104,9 +127,23 @@ export interface BatchCreateInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "ERC712_VERSION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "batchCreate",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeMetaTransaction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getDomainSeperator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lucidBudgeteer",
     data: BytesLike
@@ -129,8 +166,20 @@ export interface BatchCreateInterface extends utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {};
+  events: {
+    "MetaTransactionExecuted(address,address,bytes)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "MetaTransactionExecuted"): EventFragment;
 }
+
+export type MetaTransactionExecutedEvent = TypedEvent<
+  [string, string, string],
+  { userAddress: string; relayerAddress: string; functionSignature: string }
+>;
+
+export type MetaTransactionExecutedEventFilter =
+  TypedEventFilter<MetaTransactionExecutedEvent>;
 
 export interface BatchCreate extends BaseContract {
   contractName: "BatchCreate";
@@ -160,10 +209,30 @@ export interface BatchCreate extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<[string]>;
+
     batchCreate(
       claims: BatchCreate.CreateClaimParamsStruct[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<[string]>;
+
+    getNonce(
+      user: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { nonce: BigNumber }>;
 
     lucidBudgeteer(overrides?: CallOverrides): Promise<[string]>;
 
@@ -184,10 +253,27 @@ export interface BatchCreate extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
   batchCreate(
     claims: BatchCreate.CreateClaimParamsStruct[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  executeMetaTransaction(
+    userAddress: string,
+    functionSignature: BytesLike,
+    sigR: BytesLike,
+    sigS: BytesLike,
+    sigV: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
+  getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   lucidBudgeteer(overrides?: CallOverrides): Promise<string>;
 
@@ -208,10 +294,27 @@ export interface BatchCreate extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+
     batchCreate(
       claims: BatchCreate.CreateClaimParamsStruct[],
       overrides?: CallOverrides
     ): Promise<void>;
+
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<string>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     lucidBudgeteer(overrides?: CallOverrides): Promise<string>;
 
@@ -232,13 +335,41 @@ export interface BatchCreate extends BaseContract {
     ): Promise<void>;
   };
 
-  filters: {};
+  filters: {
+    "MetaTransactionExecuted(address,address,bytes)"(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+    MetaTransactionExecuted(
+      userAddress?: null,
+      relayerAddress?: null,
+      functionSignature?: null
+    ): MetaTransactionExecutedEventFilter;
+  };
 
   estimateGas: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
     batchCreate(
       claims: BatchCreate.CreateClaimParamsStruct[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDomainSeperator(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     lucidBudgeteer(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -260,9 +391,31 @@ export interface BatchCreate extends BaseContract {
   };
 
   populateTransaction: {
+    ERC712_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     batchCreate(
       claims: BatchCreate.CreateClaimParamsStruct[],
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    executeMetaTransaction(
+      userAddress: string,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getDomainSeperator(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNonce(
+      user: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     lucidBudgeteer(overrides?: CallOverrides): Promise<PopulatedTransaction>;

@@ -8,7 +8,6 @@ import {
   BytesLike,
   CallOverrides,
   ContractTransaction,
-  Overrides,
   PayableOverrides,
   PopulatedTransaction,
   Signer,
@@ -18,68 +17,19 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export type MultihashStruct = {
-  hash: BytesLike;
-  hashFunction: BigNumberish;
-  size: BigNumberish;
-};
-
-export type MultihashStructOutput = [string, number, number] & {
-  hash: string;
-  hashFunction: number;
-  size: number;
-};
-
-export declare namespace LucidBudgeteer {
-  export type ClaimParamsStruct = {
-    claimAmount: BigNumberish;
-    creditor: string;
-    debtor: string;
-    description: string;
-    dueBy: BigNumberish;
-    claimToken: string;
-    attachment: MultihashStruct;
-  };
-
-  export type ClaimParamsStructOutput = [
-    BigNumber,
-    string,
-    string,
-    string,
-    BigNumber,
-    string,
-    MultihashStructOutput
-  ] & {
-    claimAmount: BigNumber;
-    creditor: string;
-    debtor: string;
-    description: string;
-    dueBy: BigNumber;
-    claimToken: string;
-    attachment: MultihashStructOutput;
-  };
-}
-
-export interface LucidBudgeteerInterface extends utils.Interface {
-  contractName: "LucidBudgeteer";
+export interface NativeMetaTransactionInterface extends utils.Interface {
+  contractName: "NativeMetaTransaction";
   functions: {
     "ERC712_VERSION()": FunctionFragment;
-    "createLucidTx((uint256,address,address,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)": FunctionFragment;
     "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "getChainId()": FunctionFragment;
     "getDomainSeperator()": FunctionFragment;
     "getNonce(address)": FunctionFragment;
-    "lucidTxERC721()": FunctionFragment;
-    "updateLucidTag(uint256,bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "ERC712_VERSION",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createLucidTx",
-    values: [LucidBudgeteer.ClaimParamsStruct, BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "executeMetaTransaction",
@@ -94,21 +44,9 @@ export interface LucidBudgeteerInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "getNonce", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "lucidTxERC721",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateLucidTag",
-    values: [BigNumberish, BytesLike]
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "ERC712_VERSION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "createLucidTx",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -121,51 +59,13 @@ export interface LucidBudgeteerInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "lucidTxERC721",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateLucidTag",
-    data: BytesLike
-  ): Result;
 
   events: {
-    "LucidBudgeteerCreated(address,address,address,uint256)": EventFragment;
-    "LucidTagUpdated(address,uint256,address,bytes32,uint256)": EventFragment;
     "MetaTransactionExecuted(address,address,bytes)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "LucidBudgeteerCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LucidTagUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MetaTransactionExecuted"): EventFragment;
 }
-
-export type LucidBudgeteerCreatedEvent = TypedEvent<
-  [string, string, string, BigNumber],
-  {
-    lucidManager: string;
-    lucidTxERC721: string;
-    lucidBudgeteer: string;
-    blocktime: BigNumber;
-  }
->;
-
-export type LucidBudgeteerCreatedEventFilter =
-  TypedEventFilter<LucidBudgeteerCreatedEvent>;
-
-export type LucidTagUpdatedEvent = TypedEvent<
-  [string, BigNumber, string, string, BigNumber],
-  {
-    lucidManager: string;
-    tokenId: BigNumber;
-    updatedBy: string;
-    tag: string;
-    blocktime: BigNumber;
-  }
->;
-
-export type LucidTagUpdatedEventFilter = TypedEventFilter<LucidTagUpdatedEvent>;
 
 export type MetaTransactionExecutedEvent = TypedEvent<
   [string, string, string],
@@ -175,13 +75,13 @@ export type MetaTransactionExecutedEvent = TypedEvent<
 export type MetaTransactionExecutedEventFilter =
   TypedEventFilter<MetaTransactionExecutedEvent>;
 
-export interface LucidBudgeteer extends BaseContract {
-  contractName: "LucidBudgeteer";
+export interface NativeMetaTransaction extends BaseContract {
+  contractName: "NativeMetaTransaction";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: LucidBudgeteerInterface;
+  interface: NativeMetaTransactionInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -205,13 +105,6 @@ export interface LucidBudgeteer extends BaseContract {
   functions: {
     ERC712_VERSION(overrides?: CallOverrides): Promise<[string]>;
 
-    createLucidTx(
-      claim: LucidBudgeteer.ClaimParamsStruct,
-      lucidTag: BytesLike,
-      _tokenUri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     executeMetaTransaction(
       userAddress: string,
       functionSignature: BytesLike,
@@ -229,24 +122,9 @@ export interface LucidBudgeteer extends BaseContract {
       user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { nonce: BigNumber }>;
-
-    lucidTxERC721(overrides?: CallOverrides): Promise<[string]>;
-
-    updateLucidTag(
-      tokenId: BigNumberish,
-      newTag: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
   ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
-
-  createLucidTx(
-    claim: LucidBudgeteer.ClaimParamsStruct,
-    lucidTag: BytesLike,
-    _tokenUri: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   executeMetaTransaction(
     userAddress: string,
@@ -263,23 +141,8 @@ export interface LucidBudgeteer extends BaseContract {
 
   getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  lucidTxERC721(overrides?: CallOverrides): Promise<string>;
-
-  updateLucidTag(
-    tokenId: BigNumberish,
-    newTag: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
-
-    createLucidTx(
-      claim: LucidBudgeteer.ClaimParamsStruct,
-      lucidTag: BytesLike,
-      _tokenUri: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     executeMetaTransaction(
       userAddress: string,
@@ -295,45 +158,9 @@ export interface LucidBudgeteer extends BaseContract {
     getDomainSeperator(overrides?: CallOverrides): Promise<string>;
 
     getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    lucidTxERC721(overrides?: CallOverrides): Promise<string>;
-
-    updateLucidTag(
-      tokenId: BigNumberish,
-      newTag: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {
-    "LucidBudgeteerCreated(address,address,address,uint256)"(
-      lucidManager?: string | null,
-      lucidTxERC721?: string | null,
-      lucidBudgeteer?: null,
-      blocktime?: null
-    ): LucidBudgeteerCreatedEventFilter;
-    LucidBudgeteerCreated(
-      lucidManager?: string | null,
-      lucidTxERC721?: string | null,
-      lucidBudgeteer?: null,
-      blocktime?: null
-    ): LucidBudgeteerCreatedEventFilter;
-
-    "LucidTagUpdated(address,uint256,address,bytes32,uint256)"(
-      lucidManager?: string | null,
-      tokenId?: BigNumberish | null,
-      updatedBy?: string | null,
-      tag?: null,
-      blocktime?: null
-    ): LucidTagUpdatedEventFilter;
-    LucidTagUpdated(
-      lucidManager?: string | null,
-      tokenId?: BigNumberish | null,
-      updatedBy?: string | null,
-      tag?: null,
-      blocktime?: null
-    ): LucidTagUpdatedEventFilter;
-
     "MetaTransactionExecuted(address,address,bytes)"(
       userAddress?: null,
       relayerAddress?: null,
@@ -349,13 +176,6 @@ export interface LucidBudgeteer extends BaseContract {
   estimateGas: {
     ERC712_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    createLucidTx(
-      claim: LucidBudgeteer.ClaimParamsStruct,
-      lucidTag: BytesLike,
-      _tokenUri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     executeMetaTransaction(
       userAddress: string,
       functionSignature: BytesLike,
@@ -370,25 +190,10 @@ export interface LucidBudgeteer extends BaseContract {
     getDomainSeperator(overrides?: CallOverrides): Promise<BigNumber>;
 
     getNonce(user: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    lucidTxERC721(overrides?: CallOverrides): Promise<BigNumber>;
-
-    updateLucidTag(
-      tokenId: BigNumberish,
-      newTag: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     ERC712_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    createLucidTx(
-      claim: LucidBudgeteer.ClaimParamsStruct,
-      lucidTag: BytesLike,
-      _tokenUri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     executeMetaTransaction(
       userAddress: string,
@@ -408,14 +213,6 @@ export interface LucidBudgeteer extends BaseContract {
     getNonce(
       user: string,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    lucidTxERC721(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    updateLucidTag(
-      tokenId: BigNumberish,
-      newTag: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }
