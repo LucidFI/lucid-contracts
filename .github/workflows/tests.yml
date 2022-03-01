@@ -18,6 +18,8 @@ jobs:
       - name: setup and run hardhat tests
         run: |
           echo 'DEPLOY_PK=${{ secrets.DEPLOY_PK }}' > .env
+          echo 'DEPLOYER_ADDRESS=${{ secrets.DEPLOYER_ADDRESS }}' > .env
+          echo 'INFURA_API_KEY=${{ secrets.INFURA_API_KEY }}' > .env
           yarn 
           yarn compile
           yarn test
