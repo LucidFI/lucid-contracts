@@ -29,7 +29,7 @@ const deployCreator = async function () {
     args: [managerAddress, "https://ipfs.io/ipfs/"],
   });
 
-  const { address: bankerAddress, receipt: bankerReceipt } = await deploy(
+  const { address: budgeteerAddress, receipt: budgeteerReceipt } = await deploy(
     "LucidBudgeteer",
     {
       from: deployer,
@@ -41,11 +41,11 @@ const deployCreator = async function () {
   const { address: batchCreateAddress } = await deploy("BatchCreate", {
     from: deployer,
     log: true,
-    args: [bankerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
+    args: [budgeteerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
   });
 
   console.log({
-    bankerAddress,
+    budgeteerAddress,
     managerAddress,
     ERC721Address,
     batchCreateAddress,
@@ -61,8 +61,8 @@ const deployCreator = async function () {
     managerReceipt: managerReceipt,
     managerAddress: managerAddress,
     gasUsed: managerReceipt?.gasUsed,
-    bankerReceipt: bankerReceipt,
-    bankerAddress: bankerAddress,
+    budgeteerReceipt: budgeteerReceipt,
+    budgeteerAddress: budgeteerAddress,
   };
 
 	const deployFile = `./deploy_info/${deployInfo.filename}`;

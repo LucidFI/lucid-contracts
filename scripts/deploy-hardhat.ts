@@ -24,7 +24,7 @@ const hardhatDeploy = async () => {
     args: [managerAddress, "https://ipfs.io/ipfs/"],
   });
 
-  const { address: bankerAddress } = await deploy("LucidBudgeteer", {
+  const { address: budgeteerAddress } = await deploy("LucidBudgeteer", {
     from: deployer,
     log: true,
     args: [ERC721Address],
@@ -33,7 +33,7 @@ const hardhatDeploy = async () => {
   const { address: batchCreateAddress } = await deploy("BatchCreate", {
     from: deployer,
     log: true,
-    args: [bankerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
+    args: [budgeteerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
   });
 
   const WETH = await ethers.getContractFactory("WETH");
@@ -46,7 +46,7 @@ const hardhatDeploy = async () => {
 
   console.log({
     managerAddress,
-    bankerAddress,
+    budgeteerAddress,
     wethAddress,
     ERC721Address,
     batchCreateAddress,
