@@ -75,7 +75,6 @@ const deployCreator = async function () {
   );
 };
 
-
 function ensureDirectoryExistence(filePath: string) {
   var dirname = path.dirname(filePath);
   if (existsSync(dirname)) {
