@@ -1,4 +1,5 @@
-import { writeFileSync } from "fs";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
+import path from "path";
 import hre, { ethers } from "hardhat";
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
@@ -64,11 +65,24 @@ const deployCreator = async function () {
     bankerAddress: bankerAddress,
   };
 
+	const deployFile = `./deploy_info/${deployInfo.filename}`;
+
+	ensureDirectoryExistence(deployFile);
+
   writeFileSync(
     `./deploy_info/${deployInfo.filename}`,
     JSON.stringify(deployInfo, undefined, 4)
   );
 };
+
+function ensureDirectoryExistence(filePath: string) {
+  var dirname = path.dirname(filePath);
+  if (existsSync(dirname)) {
+    return true;
+  }
+  ensureDirectoryExistence(dirname);
+  mkdirSync(dirname);
+}
 
 deployCreator()
   .then(() => process.exit(0))
