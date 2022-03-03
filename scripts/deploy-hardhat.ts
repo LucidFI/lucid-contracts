@@ -12,8 +12,8 @@ const hardhatDeploy = async () => {
     from: deployer,
     args: [
       ethers.utils.formatBytes32String("LucidManager v1"),
-      "0x89e03E7980C92fd81Ed3A9b72F5c73fDf57E5e6D",
-      0,
+      "0xc211950B090B5FDE9483048de082B874FB2150C6",
+      0.1,
     ],
     log: true,
   });

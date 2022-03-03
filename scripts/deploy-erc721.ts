@@ -70,7 +70,7 @@ const deployCreator = async function () {
 	ensureDirectoryExistence(deployFile);
 
   writeFileSync(
-    `./deploy_info/${deployInfo.filename}`,
+    deployFile,
     JSON.stringify(deployInfo, undefined, 4)
   );
 };
