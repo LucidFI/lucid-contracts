@@ -15,6 +15,7 @@
     "compile": "npx hardhat compile && npx tsc --project tsconfig.json",
     "build": "npm run compile",
     "test": "npx hardhat test",
+    "generate": "npx hardhat typechain",
     "run-node": "npx hardhat node --fork https://rpc.xdaichain.com",
     "dev": "npx hardhat node",
     "deploy:hardhat": "npx hardhat run --network localhost scripts/deploy-hardhat.ts",
