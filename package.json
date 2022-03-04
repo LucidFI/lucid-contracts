@@ -68,7 +68,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lucidfinanace/lucid-contracts.git"
+    "url": "git+https://github.com/lucidfinance/lucid-contracts.git"
   },
   "keywords": [
     "Solidity",
