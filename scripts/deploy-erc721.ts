@@ -38,6 +38,7 @@ const deployCreator = async function () {
     }
   );
 
+
   const { address: batchCreateAddress } = await deploy("BatchCreate", {
     from: deployer,
     log: true,
