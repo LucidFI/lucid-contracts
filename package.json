@@ -1,5 +1,5 @@
 {
-  "name": "@lucid/lucid-contracts",
+  "name": "@lucidfinance/lucid-contracts",
   "version": "0.0.1",
   "license": "MIT",
   "files": [
@@ -9,7 +9,7 @@
     "typechain"
   ],
   "publishConfig": {
-    "@lucid:registry": "https://npm.pkg.github.com"
+    "@lucidfinance:registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "compile": "npx hardhat compile && npx tsc --project tsconfig.json",
