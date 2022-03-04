@@ -1,9 +1,7 @@
 
-name: Run tests 
+name: Run tests and publish
 on:
   push:
-    branches: [ master ]
-  pull_request:
     branches: [ master ]
   workflow_dispatch:
 jobs:
@@ -11,7 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.17.0
+          registry-url: https://registry.npmjs.org/
       - name: setup and run hardhat tests
         run: |
           echo 'DEPLOY_PK=${{ secrets.DEPLOY_PK }}' > .env
