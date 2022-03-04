@@ -37,6 +37,7 @@ interface ILucidTx {
         address indexed debtor,
         address origin,
         string description,
+        string proposal,
         Claim claim,
         uint256 blocktime
     );
@@ -79,9 +80,8 @@ interface ILucidTx {
     );
 
     function createClaim(
-        address creditor,
-        address debtor,
-        string memory description,
+        address[] memory parties,
+        string[] memory metadata,
         uint256 claimAmount,
         uint256 dueBy,
         address claimToken,
@@ -89,9 +89,8 @@ interface ILucidTx {
     ) external returns (uint256 newTokenId);
 
     function createClaimWithURI(
-        address creditor,
-        address debtor,
-        string memory description,
+        address[] memory parties,
+        string[] memory metadata,
         uint256 claimAmount,
         uint256 dueBy,
         address claimToken,

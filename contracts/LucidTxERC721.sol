@@ -93,7 +93,6 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
         return ContextMixin.msgSender();
     }
 
-
     function setLucidManager(address _lucidManager) public onlyOwner {
         address prevLucidManager = lucidManager;
         lucidManager = _lucidManager;
@@ -101,14 +100,16 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
     }
 
     function _createClaim(
-        address creditor,
-        address debtor,
-        string memory description,
+        address[] memory parties,
+        string[] memory metadata,
         uint256 claimAmount,
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
     ) internal returns (uint256) {
+        address creditor = parties[0];
+        address debtor = parties[1];
+
         if (creditor == address(0) || debtor == address(0)) {
             revert ZeroAddress();
         }
@@ -135,6 +136,9 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
         newClaim.attachment = attachment;
         claimTokens[newTokenId] = newClaim;
 
+        string memory _description = metadata[0];
+        string memory _proposal = metadata[1];
+
         emit ClaimCreated(
             lucidManager,
             newTokenId,
@@ -142,7 +146,8 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
             creditor,
             debtor,
             tx.origin,
-            description,
+            _description,
+            _proposal,
             newClaim,
             block.timestamp
         );
@@ -150,18 +155,17 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
     }
 
     function createClaim(
-        address creditor,
-        address debtor,
-        string memory description,
+        address[]memory parties,
+        string[] memory metadata,
         uint256 claimAmount,
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
     ) external override returns (uint256) {
+
         uint256 _tokenId = _createClaim(
-            creditor,
-            debtor,
-            description,
+            parties,
+            metadata,
             claimAmount,
             dueBy,
             claimToken,
@@ -171,9 +175,8 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
     }
 
     function createClaimWithURI(
-        address creditor,
-        address debtor,
-        string memory description,
+        address[] memory parties,
+        string[] memory _metadata,
         uint256 claimAmount,
         uint256 dueBy,
         address claimToken,
@@ -181,9 +184,8 @@ contract LucidTxERC721 is ILucidTx, LucidTxERC721URI, ContextMixin, NativeMetaTr
         string calldata _tokenUri
     ) external override returns (uint256) {
         uint256 _tokenId = _createClaim(
-            creditor,
-            debtor,
-            description,
+            parties,
+            _metadata,
             claimAmount,
             dueBy,
             claimToken,

@@ -33,6 +33,7 @@ export type MultihashStructOutput = [string, number, number] & {
 export declare namespace BatchCreate {
   export type CreateClaimParamsStruct = {
     description: string;
+    proposal: string;
     tokenURI: string;
     creditor: string;
     debtor: string;
@@ -48,6 +49,7 @@ export declare namespace BatchCreate {
     string,
     string,
     string,
+    string,
     BigNumber,
     BigNumber,
     string,
@@ -55,6 +57,7 @@ export declare namespace BatchCreate {
     MultihashStructOutput
   ] & {
     description: string;
+    proposal: string;
     tokenURI: string;
     creditor: string;
     debtor: string;
@@ -70,7 +73,7 @@ export interface BatchCreateInterface extends utils.Interface {
   contractName: "BatchCreate";
   functions: {
     "ERC712_VERSION()": FunctionFragment;
-    "batchCreate((string,string,address,address,uint256,uint256,address,bytes32,(bytes32,uint8,uint8))[])": FunctionFragment;
+    "batchCreate((string,string,string,address,address,uint256,uint256,address,bytes32,(bytes32,uint8,uint8))[])": FunctionFragment;
     "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "getChainId()": FunctionFragment;
     "getDomainSeperator()": FunctionFragment;

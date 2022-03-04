@@ -44,6 +44,7 @@ describe("Lucid Budgeteer", function () {
     describe("Assigning Tags", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
+        const proposal = utils.formatBytes32String("0x157019768a338f666dc543734358987d992ff6feb4c68e21ec6d46c6c7906db9");
         const someMultihash = {
             hash: ethers.utils.formatBytes32String("some hash"),
             hashFunction: 0,
@@ -58,11 +59,12 @@ describe("Lucid Budgeteer", function () {
                     {
                         claimAmount,
                         creditor: creditor.address,
-                        debtor:debtor.address,
+                        debtor: debtor.address,
                         attachment: someMultihash,
                         claimToken: erc20Contract.address,
                         dueBy,
-                        description: "test"
+                        description: "test",
+                        proposal
                     },
                     creditorTag,
                     'testURI'
@@ -74,11 +76,12 @@ describe("Lucid Budgeteer", function () {
                     {
                         claimAmount,
                         creditor: creditor.address,
-                        debtor:debtor.address,
+                        debtor: debtor.address,
                         attachment: someMultihash,
                         claimToken: erc20Contract.address,
                         dueBy,
-                        description: "test"
+                        proposal,
+                        description: "test",
                     },
                     creditorTag,
                     'testURI'
@@ -108,12 +111,13 @@ describe("Lucid Budgeteer", function () {
                 .createLucidTx(
                     {
                         claimAmount,
+                        debtor: debtor.address,
                         creditor: creditor.address,
-                        debtor:debtor.address,
                         attachment: someMultihash,
                         claimToken: erc20Contract.address,
                         dueBy,
-                        description: "test"
+                        description: "test",
+                        proposal
                     },
                     creditorTag,
                     'testURI'

@@ -13,6 +13,7 @@ error ValueMustBeGreaterThanZero();
 
 contract LucidManager is ILucidManager, ContextMixin, NativeMetaTransaction  {
     bytes32 public immutable description;
+    bytes32 public immutable proposal;
     FeeInfo public feeInfo;
     IERC20 public lucidToken;
     address public owner;
@@ -24,12 +25,14 @@ contract LucidManager is ILucidManager, ContextMixin, NativeMetaTransaction  {
 
     constructor(
         bytes32 _description,
+        bytes32 _proposal,
         address payable _collectionAddress,
         uint32 _feeBasisPoints
     ) {
         owner = _msgSender();
         feeInfo.collectionAddress = _collectionAddress;
         description = _description;
+        proposal = _proposal;
         feeInfo.feeBasisPoints = _feeBasisPoints;
 
         emit FeeChanged(address(this), 0, _feeBasisPoints, block.timestamp);

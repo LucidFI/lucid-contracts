@@ -66,8 +66,8 @@ export interface LucidTxERC721Interface extends utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
     "burn(uint256)": FunctionFragment;
-    "createClaim(address,address,string,uint256,uint256,address,(bytes32,uint8,uint8))": FunctionFragment;
-    "createClaimWithURI(address,address,string,uint256,uint256,address,(bytes32,uint8,uint8),string)": FunctionFragment;
+    "createClaim(address[],string[],uint256,uint256,address,(bytes32,uint8,uint8))": FunctionFragment;
+    "createClaimWithURI(address[],string[],uint256,uint256,address,(bytes32,uint8,uint8),string)": FunctionFragment;
     "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getChainId()": FunctionFragment;
@@ -109,9 +109,8 @@ export interface LucidTxERC721Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createClaim",
     values: [
-      string,
-      string,
-      string,
+      string[],
+      string[],
       BigNumberish,
       BigNumberish,
       string,
@@ -121,9 +120,8 @@ export interface LucidTxERC721Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createClaimWithURI",
     values: [
-      string,
-      string,
-      string,
+      string[],
+      string[],
       BigNumberish,
       BigNumberish,
       string,
@@ -307,7 +305,7 @@ export interface LucidTxERC721Interface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "ClaimCreated(address,uint256,address,address,address,address,string,tuple,uint256)": EventFragment;
+    "ClaimCreated(address,uint256,address,address,address,address,string,string,tuple,uint256)": EventFragment;
     "ClaimPayment(address,uint256,address,address,address,uint256,uint256)": EventFragment;
     "ClaimRejected(address,uint256,uint256)": EventFragment;
     "ClaimRescinded(address,uint256,uint256)": EventFragment;
@@ -354,6 +352,7 @@ export type ClaimCreatedEvent = TypedEvent<
     string,
     string,
     string,
+    string,
     ClaimStructOutput,
     BigNumber
   ],
@@ -365,6 +364,7 @@ export type ClaimCreatedEvent = TypedEvent<
     debtor: string;
     origin: string;
     description: string;
+    proposal: string;
     claim: ClaimStructOutput;
     blocktime: BigNumber;
   }
@@ -491,9 +491,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<ContractTransaction>;
 
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -502,9 +501,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<ContractTransaction>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      _metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -654,9 +652,8 @@ export interface LucidTxERC721 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   createClaim(
-    creditor: string,
-    debtor: string,
-    description: string,
+    parties: string[],
+    metadata: string[],
     claimAmount: BigNumberish,
     dueBy: BigNumberish,
     claimToken: string,
@@ -665,9 +662,8 @@ export interface LucidTxERC721 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   createClaimWithURI(
-    creditor: string,
-    debtor: string,
-    description: string,
+    parties: string[],
+    _metadata: string[],
     claimAmount: BigNumberish,
     dueBy: BigNumberish,
     claimToken: string,
@@ -805,9 +801,8 @@ export interface LucidTxERC721 extends BaseContract {
     burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -816,9 +811,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<BigNumber>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      _metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -959,7 +953,7 @@ export interface LucidTxERC721 extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "ClaimCreated(address,uint256,address,address,address,address,string,tuple,uint256)"(
+    "ClaimCreated(address,uint256,address,address,address,address,string,string,tuple,uint256)"(
       lucidManager?: null,
       tokenId?: BigNumberish | null,
       parent?: null,
@@ -967,6 +961,7 @@ export interface LucidTxERC721 extends BaseContract {
       debtor?: string | null,
       origin?: null,
       description?: null,
+      proposal?: null,
       claim?: null,
       blocktime?: null
     ): ClaimCreatedEventFilter;
@@ -978,6 +973,7 @@ export interface LucidTxERC721 extends BaseContract {
       debtor?: string | null,
       origin?: null,
       description?: null,
+      proposal?: null,
       claim?: null,
       blocktime?: null
     ): ClaimCreatedEventFilter;
@@ -1102,9 +1098,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<BigNumber>;
 
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -1113,9 +1108,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<BigNumber>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      _metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -1266,9 +1260,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -1277,9 +1270,8 @@ export interface LucidTxERC721 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      _metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,

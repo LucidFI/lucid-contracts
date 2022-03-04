@@ -21,6 +21,7 @@ describe("test module", async () => {
   let [safeOwner1, safeOwner2, outsider, collector, creditor] =
     declareSignerWithAddress();
   let feeBasisPoint = 1000;
+  const proposal = ethers.utils.formatBytes32String("0x157019768a338f666dc543734358987d992ff6feb4c68e21ec6d46c6c7906db9"),
 
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture();
@@ -51,6 +52,7 @@ describe("test module", async () => {
     const lucidToken = await ERC20.deploy();
     const lucidManager = await LucidManager.deploy(
       ethers.utils.formatBytes32String("Lucid Manager Test"),
+      proposal,
       collector.address,
       feeBasisPoint
     );
@@ -104,6 +106,7 @@ describe("test module", async () => {
         creditor: creditorAddress,
         debtor: debtorAddress,
         description: "claim!",
+        proposal,
         claimAmount: utils.parseEther("1"),
         claimToken: tokenAddress,
         dueBy,
@@ -171,12 +174,14 @@ describe("test module", async () => {
 
         const batchPayment = [...Array(20)].map(() => ({
           claimAmount: utils.parseEther("1"),
+          parties: [creditor.address, safe.address],
           creditor: creditor.address,
           debtor: safe.address,
           claimToken: lucidToken.address,
           dueBy,
           tag: ethers.utils.formatBytes32String("test"),
           description: `claim! ${Math.random()}`,
+          proposal,
           tokenURI: `ipfs.io/ipfs/${Math.random()}`,
           attachment: {
             hash: utils.formatBytes32String("some hash"),
@@ -200,11 +205,13 @@ describe("test module", async () => {
 
         const batchPayment = [...Array(20)].map(() => ({
           claimAmount: utils.parseEther("1"),
-          creditor: creditor.address,
+          parties: [creditor.address, safeOwner1],
           debtor: safeOwner1.address,
+          creditor: creditor.address,
           claimToken: lucidToken.address,
           dueBy,
           tag: ethers.utils.formatBytes32String("test"),
+          proposal,
           description: `claim! ${Math.random()}`,
           tokenURI: `ipfs.io/ipfs/${Math.random()}`,
           attachment: {
@@ -223,12 +230,14 @@ describe("test module", async () => {
         const { lucidBudgeteerModule, lucidToken, safe } = await setupTests();
         const batchPayment = [...Array(20)].map(() => ({
           claimAmount: utils.parseEther("1"),
+          parties: [creditor.address, safe.address],
           creditor: creditor.address,
           debtor: safe.address,
           claimToken: lucidToken.address,
           dueBy,
           tag: ethers.utils.formatBytes32String("test"),
-          description: `claim! ${Math.random()}`,
+          description: `developer_dao sponsorship! ${Math.random()}`,
+          proposal,
           tokenURI: `ipfs.io/ipfs/${Math.random()}`,
           attachment: {
             hash: utils.formatBytes32String("some hash"),

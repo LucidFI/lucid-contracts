@@ -33,6 +33,7 @@ export type MultihashStructOutput = [string, number, number] & {
 export declare namespace BatchCreate {
   export type CreateClaimParamsStruct = {
     description: string;
+    proposal: string;
     tokenURI: string;
     creditor: string;
     debtor: string;
@@ -48,6 +49,7 @@ export declare namespace BatchCreate {
     string,
     string,
     string,
+    string,
     BigNumber,
     BigNumber,
     string,
@@ -55,6 +57,7 @@ export declare namespace BatchCreate {
     MultihashStructOutput
   ] & {
     description: string;
+    proposal: string;
     tokenURI: string;
     creditor: string;
     debtor: string;
@@ -72,6 +75,7 @@ export declare namespace LucidBudgeteer {
     creditor: string;
     debtor: string;
     description: string;
+    proposal: string;
     dueBy: BigNumberish;
     claimToken: string;
     attachment: MultihashStruct;
@@ -79,6 +83,7 @@ export declare namespace LucidBudgeteer {
 
   export type ClaimParamsStructOutput = [
     BigNumber,
+    string,
     string,
     string,
     string,
@@ -90,6 +95,7 @@ export declare namespace LucidBudgeteer {
     creditor: string;
     debtor: string;
     description: string;
+    proposal: string;
     dueBy: BigNumber;
     claimToken: string;
     attachment: MultihashStructOutput;
@@ -102,9 +108,9 @@ export interface LucidBudgeteerModuleInterface extends utils.Interface {
     "ERC712_VERSION()": FunctionFragment;
     "VERSION()": FunctionFragment;
     "avatar()": FunctionFragment;
-    "batchCreate((string,string,address,address,uint256,uint256,address,bytes32,(bytes32,uint8,uint8))[])": FunctionFragment;
+    "batchCreate((string,string,string,address,address,uint256,uint256,address,bytes32,(bytes32,uint8,uint8))[])": FunctionFragment;
     "batchCreateAddress()": FunctionFragment;
-    "createLucidTx((uint256,address,address,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)": FunctionFragment;
+    "createLucidTx((uint256,address,address,string,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)": FunctionFragment;
     "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "getChainId()": FunctionFragment;
     "getDomainSeperator()": FunctionFragment;

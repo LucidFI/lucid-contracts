@@ -30,6 +30,7 @@ contract LucidBudgeteer is ContextMixin, NativeMetaTransaction {
         address creditor;
         address debtor;
         string description;
+        string proposal;
         uint256 dueBy;
         address claimToken;
         Multihash attachment;
@@ -62,11 +63,28 @@ contract LucidBudgeteer is ContextMixin, NativeMetaTransaction {
             revert NotCreditorOrDebtor(_msgSender());
 
         address _lucidTxERC721Address = lucidTxERC721;
+
+        // avoids stack to deep errors with more than 8 args
+        address[] memory _parties = new address[](2);
+        _parties[0] = claim.creditor;
+        _parties[1] = claim.debtor;
+        require(
+            _parties.length > 1,
+            "LUCIDBUDGETEER: creditor and debtor not defined"
+        );
+
+        string[] memory _metadata = new string[](2);
+        _metadata[0] = claim.description;
+        _metadata[1] = claim.proposal;
+        require(
+            _metadata.length > 1,
+            "LUCIDBUDGETEER: creditor and debtor not defined"
+        );
+
         uint256 newTokenId = LucidTxERC721(_lucidTxERC721Address)
             .createClaimWithURI(
-                claim.creditor,
-                claim.debtor,
-                claim.description,
+                _parties,
+                _metadata,
                 claim.claimAmount,
                 claim.dueBy,
                 claim.claimToken,

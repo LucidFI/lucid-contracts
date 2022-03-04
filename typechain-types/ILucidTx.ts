@@ -60,8 +60,8 @@ export type ClaimStructOutput = [
 export interface ILucidTxInterface extends utils.Interface {
   contractName: "ILucidTx";
   functions: {
-    "createClaim(address,address,string,uint256,uint256,address,(bytes32,uint8,uint8))": FunctionFragment;
-    "createClaimWithURI(address,address,string,uint256,uint256,address,(bytes32,uint8,uint8),string)": FunctionFragment;
+    "createClaim(address[],string[],uint256,uint256,address,(bytes32,uint8,uint8))": FunctionFragment;
+    "createClaimWithURI(address[],string[],uint256,uint256,address,(bytes32,uint8,uint8),string)": FunctionFragment;
     "getClaim(uint256)": FunctionFragment;
     "lucidManager()": FunctionFragment;
     "payClaim(uint256,uint256)": FunctionFragment;
@@ -72,9 +72,8 @@ export interface ILucidTxInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createClaim",
     values: [
-      string,
-      string,
-      string,
+      string[],
+      string[],
       BigNumberish,
       BigNumberish,
       string,
@@ -84,9 +83,8 @@ export interface ILucidTxInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createClaimWithURI",
     values: [
-      string,
-      string,
-      string,
+      string[],
+      string[],
       BigNumberish,
       BigNumberish,
       string,
@@ -139,7 +137,7 @@ export interface ILucidTxInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "ClaimCreated(address,uint256,address,address,address,address,string,tuple,uint256)": EventFragment;
+    "ClaimCreated(address,uint256,address,address,address,address,string,string,tuple,uint256)": EventFragment;
     "ClaimPayment(address,uint256,address,address,address,uint256,uint256)": EventFragment;
     "ClaimRejected(address,uint256,uint256)": EventFragment;
     "ClaimRescinded(address,uint256,uint256)": EventFragment;
@@ -164,6 +162,7 @@ export type ClaimCreatedEvent = TypedEvent<
     string,
     string,
     string,
+    string,
     ClaimStructOutput,
     BigNumber
   ],
@@ -175,6 +174,7 @@ export type ClaimCreatedEvent = TypedEvent<
     debtor: string;
     origin: string;
     description: string;
+    proposal: string;
     claim: ClaimStructOutput;
     blocktime: BigNumber;
   }
@@ -261,9 +261,8 @@ export interface ILucidTx extends BaseContract {
 
   functions: {
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -272,9 +271,8 @@ export interface ILucidTx extends BaseContract {
     ): Promise<ContractTransaction>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -308,9 +306,8 @@ export interface ILucidTx extends BaseContract {
   };
 
   createClaim(
-    creditor: string,
-    debtor: string,
-    description: string,
+    parties: string[],
+    metadata: string[],
     claimAmount: BigNumberish,
     dueBy: BigNumberish,
     claimToken: string,
@@ -319,9 +316,8 @@ export interface ILucidTx extends BaseContract {
   ): Promise<ContractTransaction>;
 
   createClaimWithURI(
-    creditor: string,
-    debtor: string,
-    description: string,
+    parties: string[],
+    metadata: string[],
     claimAmount: BigNumberish,
     dueBy: BigNumberish,
     claimToken: string,
@@ -355,9 +351,8 @@ export interface ILucidTx extends BaseContract {
 
   callStatic: {
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -366,9 +361,8 @@ export interface ILucidTx extends BaseContract {
     ): Promise<BigNumber>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -402,7 +396,7 @@ export interface ILucidTx extends BaseContract {
   };
 
   filters: {
-    "ClaimCreated(address,uint256,address,address,address,address,string,tuple,uint256)"(
+    "ClaimCreated(address,uint256,address,address,address,address,string,string,tuple,uint256)"(
       lucidManager?: null,
       tokenId?: BigNumberish | null,
       parent?: null,
@@ -410,6 +404,7 @@ export interface ILucidTx extends BaseContract {
       debtor?: string | null,
       origin?: null,
       description?: null,
+      proposal?: null,
       claim?: null,
       blocktime?: null
     ): ClaimCreatedEventFilter;
@@ -421,6 +416,7 @@ export interface ILucidTx extends BaseContract {
       debtor?: string | null,
       origin?: null,
       description?: null,
+      proposal?: null,
       claim?: null,
       blocktime?: null
     ): ClaimCreatedEventFilter;
@@ -497,9 +493,8 @@ export interface ILucidTx extends BaseContract {
 
   estimateGas: {
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -508,9 +503,8 @@ export interface ILucidTx extends BaseContract {
     ): Promise<BigNumber>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -545,9 +539,8 @@ export interface ILucidTx extends BaseContract {
 
   populateTransaction: {
     createClaim(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,
@@ -556,9 +549,8 @@ export interface ILucidTx extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createClaimWithURI(
-      creditor: string,
-      debtor: string,
-      description: string,
+      parties: string[],
+      metadata: string[],
       claimAmount: BigNumberish,
       dueBy: BigNumberish,
       claimToken: string,

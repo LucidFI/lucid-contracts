@@ -33,6 +33,7 @@ export interface LucidManagerInterface extends utils.Interface {
     "getTransactionFee(address,uint256)": FunctionFragment;
     "lucidToken()": FunctionFragment;
     "owner()": FunctionFragment;
+    "proposal()": FunctionFragment;
     "setCollectionAddress(address)": FunctionFragment;
     "setFee(uint32)": FunctionFragment;
     "setLucidTokenAddress(address)": FunctionFragment;
@@ -77,6 +78,7 @@ export interface LucidManagerInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "proposal", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setCollectionAddress",
     values: [string]
@@ -129,6 +131,7 @@ export interface LucidManagerInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "lucidToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "proposal", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setCollectionAddress",
     data: BytesLike
@@ -334,6 +337,8 @@ export interface LucidManager extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    proposal(overrides?: CallOverrides): Promise<[string]>;
+
     setCollectionAddress(
       _collectionAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -417,6 +422,8 @@ export interface LucidManager extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  proposal(overrides?: CallOverrides): Promise<string>;
+
   setCollectionAddress(
     _collectionAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -499,6 +506,8 @@ export interface LucidManager extends BaseContract {
     lucidToken(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
+
+    proposal(overrides?: CallOverrides): Promise<string>;
 
     setCollectionAddress(
       _collectionAddress: string,
@@ -658,6 +667,8 @@ export interface LucidManager extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    proposal(overrides?: CallOverrides): Promise<BigNumber>;
+
     setCollectionAddress(
       _collectionAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -735,6 +746,8 @@ export interface LucidManager extends BaseContract {
     lucidToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    proposal(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setCollectionAddress(
       _collectionAddress: string,

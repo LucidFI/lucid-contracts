@@ -36,6 +36,7 @@ export declare namespace LucidBudgeteer {
     creditor: string;
     debtor: string;
     description: string;
+    proposal: string;
     dueBy: BigNumberish;
     claimToken: string;
     attachment: MultihashStruct;
@@ -43,6 +44,7 @@ export declare namespace LucidBudgeteer {
 
   export type ClaimParamsStructOutput = [
     BigNumber,
+    string,
     string,
     string,
     string,
@@ -54,6 +56,7 @@ export declare namespace LucidBudgeteer {
     creditor: string;
     debtor: string;
     description: string;
+    proposal: string;
     dueBy: BigNumber;
     claimToken: string;
     attachment: MultihashStructOutput;
@@ -64,7 +67,7 @@ export interface LucidBudgeteerInterface extends utils.Interface {
   contractName: "LucidBudgeteer";
   functions: {
     "ERC712_VERSION()": FunctionFragment;
-    "createLucidTx((uint256,address,address,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)": FunctionFragment;
+    "createLucidTx((uint256,address,address,string,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)": FunctionFragment;
     "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "getChainId()": FunctionFragment;
     "getDomainSeperator()": FunctionFragment;

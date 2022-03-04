@@ -28,14 +28,13 @@ describe("Lucid Claim ERC721", function () {
         size: 0,
     };
 
-    async function createClaim(creditor: string, debtor: string, description: string, claimAmount: any, erc20Contract: any) {
+    async function createClaim(creditor: string, debtor: string, description: string, proposal: string, claimAmount: any, erc20Contract: any) {
         dueBy = (await (await ethers.provider.getBlock('latest')).timestamp) + 100;
 
         // Check Unhappy State
         await expect(lucidTxERC721.createClaim(
-            ethers.constants.AddressZero,
-            debtor,
-            description,
+            [ethers.constants.AddressZero, debtor],
+            [description, proposal],
             claimAmount,
             dueBy,
             erc20Contract.address,
@@ -43,9 +42,8 @@ describe("Lucid Claim ERC721", function () {
         )).to.be.revertedWith('ZeroAddress')
 
         await expect(lucidTxERC721.createClaim(
-            creditor,
-            ethers.constants.AddressZero,
-            description,
+            [creditor, ethers.constants.AddressZero],
+            [description, proposal],
             claimAmount,
             dueBy,
             erc20Contract.address,
@@ -53,9 +51,8 @@ describe("Lucid Claim ERC721", function () {
         )).to.be.revertedWith('ZeroAddress')
 
         await expect(lucidTxERC721.createClaim(
-            creditor,
-            debtor,
-            description,
+            [creditor, debtor],
+            [description, proposal],
             0,
             dueBy,
             erc20Contract.address,
@@ -63,9 +60,8 @@ describe("Lucid Claim ERC721", function () {
         )).to.be.revertedWith('ValueMustBeGreaterThanZero')
 
         await expect(lucidTxERC721.createClaim(
-            creditor,
-            debtor,
-            description,
+            [creditor, debtor],
+            [description, proposal],
             claimAmount,
             dueBy - 100,
             erc20Contract.address,
@@ -73,9 +69,8 @@ describe("Lucid Claim ERC721", function () {
         )).to.be.revertedWith('PastDueDate')
 
         await expect(lucidTxERC721.createClaim(
-            creditor,
-            debtor,
-            description,
+            [creditor, debtor],
+            [description, proposal],
             claimAmount,
             dueBy,
             creditor,
@@ -83,9 +78,8 @@ describe("Lucid Claim ERC721", function () {
         )).to.be.revertedWith('ClaimTokenNotContract')
 
         let tx = await lucidTxERC721.createClaim(
-            creditor,
-            debtor,
-            description,
+            [creditor, debtor],
+            [description, proposal],
             claimAmount,
             dueBy,
             erc20Contract.address,
@@ -142,18 +136,21 @@ describe("Lucid Claim ERC721", function () {
                 creditor.address,
                 debtor.address,
                 'Something New',
+                'Something New',
                 1,
                 erc20Contract);
             await createClaim(
                 debtor.address,
                 creditor.address,
                 'Something Borrowed',
+                'sdfsdfxsdf23kd8pj',
                 100,
                 erc20Contract);
             await createClaim(
                 creditor.address,
                 debtor.address,
                 'Something Old',
+                'sdfsdfxsdf23kd8pj',
                 10000,
                 erc20Contract);
         })
@@ -163,6 +160,7 @@ describe("Lucid Claim ERC721", function () {
                 creditor.address,
                 debtor.address,
                 'my Claim',
+                'sdfsdfxsdf23kd8pj',
                 100,
                 erc20Contract);
 
@@ -187,6 +185,7 @@ describe("Lucid Claim ERC721", function () {
                 creditor.address,
                 debtor.address,
                 'my Claim',
+                'sdfsdfxsdf23kd8pj',
                 100,
                 erc20Contract);
 
@@ -217,6 +216,7 @@ describe("Lucid Claim ERC721", function () {
                 creditor.address,
                 debtor.address,
                 'my Claim',
+                'sdfsdfxsdf23kd8pj',
                 100,
                 erc20Contract);
 
@@ -240,6 +240,7 @@ describe("Lucid Claim ERC721", function () {
                 creditor.address,
                 debtor.address,
                 'my Claim',
+                'sdfsdfxsdf23kd8pj',
                 100,
                 erc20Contract);
 

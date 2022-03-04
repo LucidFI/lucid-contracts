@@ -26,6 +26,7 @@ contract BatchCreate is ContextMixin, NativeMetaTransaction {
 
     struct CreateClaimParams {
         string description;
+        string proposal;
         string tokenURI;
         address creditor;
         address debtor;
@@ -87,6 +88,7 @@ contract BatchCreate is ContextMixin, NativeMetaTransaction {
                         claims[i].creditor,
                         claims[i].debtor,
                         claims[i].description,
+                        claims[i].proposal,
                         claims[i].dueBy,
                         claims[i].claimToken,
                         claims[i].attachment

@@ -53,6 +53,12 @@ const _abi = [
         type: "string",
       },
       {
+        indexed: false,
+        internalType: "string",
+        name: "proposal",
+        type: "string",
+      },
+      {
         components: [
           {
             internalType: "uint256",
@@ -292,19 +298,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "creditor",
-        type: "address",
+        internalType: "address[]",
+        name: "parties",
+        type: "address[]",
       },
       {
-        internalType: "address",
-        name: "debtor",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "description",
-        type: "string",
+        internalType: "string[]",
+        name: "metadata",
+        type: "string[]",
       },
       {
         internalType: "uint256",
@@ -358,19 +359,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "creditor",
-        type: "address",
+        internalType: "address[]",
+        name: "parties",
+        type: "address[]",
       },
       {
-        internalType: "address",
-        name: "debtor",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "description",
-        type: "string",
+        internalType: "string[]",
+        name: "metadata",
+        type: "string[]",
       },
       {
         internalType: "uint256",

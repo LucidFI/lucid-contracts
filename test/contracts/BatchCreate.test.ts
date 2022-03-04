@@ -53,6 +53,7 @@ describe("test module", async () => {
     const lucidToken = await ERC20.connect(wallet1).deploy();
     const lucidManager = await LucidManager.deploy(
       ethers.utils.formatBytes32String("Lucid Manager Test"),
+      ethers.utils.formatBytes32String("proposal tx"),
       collector.address,
       feeBasisPoint
     );
@@ -102,6 +103,7 @@ describe("test module", async () => {
       dueBy,
       tag: defaultTag,
       description: `claim! ${Math.random()}`,
+      proposal: "0x157019768a338f666dc543734358987d992ff6feb4c68e21ec6d46c6c7906db9",
       tokenURI: `ipfs.io/ipfs/${Math.random()}`,
       attachment: {
         hash: utils.formatBytes32String("some hash"),
