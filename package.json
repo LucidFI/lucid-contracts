@@ -9,7 +9,7 @@
     "typechain"
   ],
   "publishConfig": {
-    "registry":"https://npm.pkg.github.com"
+    "@lucid:registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "compile": "npx hardhat compile && npx tsc --project tsconfig.json",
@@ -60,5 +60,24 @@
     "ts-node": "^10.5.0",
     "typechain": "^7.0.0",
     "typescript": "^4.6.2"
-  }
+  },
+  "description": "Smart contracts for LucidFI budgeting app",
+  "main": "contracts",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucidFI/lucid-contracts.git"
+  },
+  "keywords": [
+    "Solidity",
+    "Ethereum",
+    "Finance"
+  ],
+  "author": "sherodtaylor <sherodtaylor@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/LucidFI/lucid-contracts/issues"
+  },
+  "homepage": "https://github.com/LucidFI/lucid-contracts#readme"
 }
