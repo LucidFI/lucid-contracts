@@ -1,3 +1,5 @@
+[![Run tests and publish](https://github.com/lucidfinance/lucid-contracts/actions/workflows/publish.yml/badge.svg)](https://github.com/lucidfinance/lucid-contracts/actions/workflows/publish.yml)
+
 # Lucid Contract Code
 
 
